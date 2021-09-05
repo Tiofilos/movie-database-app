@@ -283,39 +283,16 @@ mongoose.connect("mongodb://localhost:27017/myMovieApp", {
 //   res.send(responseText);
 // });
 
-// //Error handling
-// app.use((err, req, res, next) => {
-//   console.log(err.stack);
-//   res.status(500).send("Something went wrong!");
-// });
 
-// app.listen(8080, () => {
-//   console.log("Your server is live and listening on port 8080.");
-// });
-
-
-
-
-// db.movies.find({ "Genre.Name": "Thriller" })
-
-//Movies 
-//return all movies
-app.get('/movies', (req, res) => {
-	Movies.find()
-		.then((movies) => {
-			res.status(201).json(movies);
-		})
-		.catch((err) => {
-			console.error(err);
-			res.status(500).send('Error: ' + err);
-		});
+// GET requests
+app.get('/', (req, res) => {
+  res.send('Welcome to myMoviesApp');
 });
-
-// Get a movie by title
-app.get('/movies/:title', (req, res) => {     //note that there is no : in the real url to access this on the webpage
-  Movies.findOne({ Title: req.params.Title })
-    .then((movie) => {
-      res.json(movie);
+//get all movies
+app.get('/movies', (req, res) => {
+  Movies.find()
+  .then((movies) => {
+    res.status(201).json(movies);
   })
   .catch((err) => {
     console.error(err);
@@ -323,13 +300,95 @@ app.get('/movies/:title', (req, res) => {     //note that there is no : in the r
   });
 });
 
-app.get("/movies/genre/:name", (req, res) => { 
+//get movie by title
+app.get('/movies/:Title', (req, res) => {
+  Movies.findOne({ Title: req.params.Title })
+    .then((movie) => {
+      res.json(movie);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
+// return data about a genre by name/title
+app.get('/movies/genres/:genre', (req, res) => {
+  res.send('succefully returned data on a single genre');
+  });
+app.get('/genres/:Name', (req, res) => {
+  Genres.findOne({ Name: req.params.Name })
+    .then((genre) => {
+      res.json(genre);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+  });
+// return data about a director by name
+app.get('/movies/directors/:director', (req, res) => {
+  res.send('Successfully returned data on a single director');
+});
+app.get('/directors/:Name', (req, res) => {
+  Directors.findOne({ Name: req.params.Name })
+    .then((director) => {
+      res.json(director);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});
 
-
-
-
-app.get("/movies/directors/:name", (req, res) => { 
+app.get('/movies/genre/:name', (req, res) => {
+  res.json(movies.find((movie) => {
+    return movie.genre.gname === req.params.name;
+  }));
+});
+  
+// // remove a movie from user favorites by ID
+app.delete('/users/:Username/movies/:MovieID', (req, res) => {
+  Users.findOneAndUpdate(
+    { Username: req.params.Username },
+    { $pull: { FavoriteMovies: req.params.MovieID } },
+    { new: true }, // This line makes sure that the updated document is returned
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+      } else {
+        res.json(updatedUser);
+      }
+    }
+  );
+});
  
+ 
+
+
+// Get all users ---Read in Mongoose
+app.get('/users', (req, res) => {
+	Users.find()
+		.then((users) => {
+			res.status(201).json(users);
+		})
+		.catch((err) => {
+			console.error(err);
+			res.status(500).send('Error: ' + err);
+		});
+});
+
+// Get a user by username
+app.get('/users/:Username', (req, res) => {     //note that there is no : in the real url to access this on the webpage
+  Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  });
+});
 //Add a user ---Create in Mongoose
 /* We’ll expect JSON in this format
 {
@@ -363,31 +422,6 @@ app.post('/users', (req, res) => {
 		console.error(error);
 		res.status(500).send('Error: ' + error);
 	});
-});
-
-
-// Get all users ---Read in Mongoose
-app.get('/users', (req, res) => {
-	Users.find()
-		.then((users) => {
-			res.status(201).json(users);
-		})
-		.catch((err) => {
-			console.error(err);
-			res.status(500).send('Error: ' + err);
-		});
-});
-
-// Get a user by username
-app.get('/users/:Username', (req, res) => {     //note that there is no : in the real url to access this on the webpage
-  Users.findOne({ Username: req.params.Username })
-    .then((user) => {
-      res.json(user);
-  })
-  .catch((err) => {
-    console.error(err);
-    res.status(500).send('Error: ' + err);
-  });
 });
 
 // Update a user's info, by username ----update in CRUD
@@ -453,26 +487,17 @@ app.delete('/users/:Username', (req, res) => {
     });
 });
 
-// remove a movie from a user's list of favorites
-app.delete('/users/:Username/movies/:MovieID', (req, res) => {
-  Users.findOneAndRemove({ Username: req.params.Username }, {
-      $push: { FavoriteMovies: req.params.MovieID }
-    },
-    { new: true }, // This line makes sure that the updated document is returned
-  (err, updatedUser) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    } else {
-      res.json(updatedUser);
-    }
-  });
+// allow users to deregister
+app.delete('/users/:ID/deactivate', (req, res) => {
+  res.send('Successful DELETE request removing user');
 });
 
+//Error handling
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  res.status(500).send("Something went wrong!");
+});
 
-
-
-
-app.listen(8080, () => {
-  console.log("Your server is live and listening on port 8080.");
-  });
+app.listen(8081, () => {
+  console.log("Your server is live and listening on port 8081.");
+});
