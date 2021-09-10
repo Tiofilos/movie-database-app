@@ -1,7 +1,7 @@
 //Step1 importing mongoose package
 const mongoose = require('mongoose');
 //Importing bcrypt for HASHING password
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 //Step 2  Defining schemas
 let movieSchema = mongoose.Schema({            //this defines the movie schema 
 	Title: {type: String, required: true},
