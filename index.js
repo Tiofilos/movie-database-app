@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("express"),
 (morgan = require("morgan")),
   (bodyParser = require("body-parser")),
   (uuid = require("uuid"));
@@ -168,11 +168,13 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
 	Email: String,
 	Birthday: Date
 }*/
-app.post('/users', [  //validation logic here
-	check('Username', 'Username is required').isLength({min: 5}), 
+app.post('/users',  //validation logic here
+  [
+  check('Username', 'Username is required').isLength({min: 5}), 
 	check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(), 				
-	check('Password', 'Password is required').not().isEmpty(), check('Email', 'Email does not appear to be valid').isEmail()
- ], (req, res) => {
+	check('Password', 'Password is required').not().isEmpty(), 
+  check('Email', 'Email does not appear to be valid').isEmail()
+  ], (req, res) => {
   let errors = validationResult(req); //checking validation objects for errors here
   if (!errors.isEmpty()) { 
 	return res.status(422).json({ errors: errors.array() }); 
@@ -185,7 +187,7 @@ Users.findOne({ Username: req.body.Username })  //checks for existing user
 		} else {
 			Users.create({
 					Username: req.body.Username,
-					Password: req.body.Password,
+					Password: hashedPassword,
 					Email: req.body.Email,
 					Birthday: req.body.Birthday
 				})
