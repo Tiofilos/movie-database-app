@@ -2,10 +2,9 @@ const express = require("express"),
   bodyParser = require("body-parser"),
   morgan = require("morgan"),
   uuid = require("uuid");
-  const app = express();
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-  const mongoose = require("mongoose"); //needed to access the model connecting to external database
+const app = express();
+  
+const mongoose = require("mongoose"); //needed to access the model connecting to external database
 const Models = require("./models.js");
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -27,14 +26,16 @@ app.use(requestTime);
 app.use(myLogger);
 app.use(morgan("common"));
 app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const cors = require('cors'); //needed for controlling which domain can access my server
 app.use(cors());
 
 let auth = require('./auth')(app);     //needed to access auth and passport files...where authentication and authorizations are defined
 const passport = require('passport'); 
 require('./passport');
-
-mongoose.connect(process.env.MYAPI, {
+const uri = process.env.MYAPI || "mongodb://localhost:27017/myMovieApp";
+mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }); //this connects mongoose to mongodb to access external database
@@ -284,11 +285,11 @@ app.use((err, req, res, next) => {
 // app.listen(8081, () => {
 //   console.log("Your server is live and listening on port 8081.");
 // });
+
 const port = process.env.PORT || 8082;
 app.listen(port, '0.0.0.0',() => { 
 	console.log('Listening on Port ' + port);
 });
-
 
 
 
