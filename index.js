@@ -42,7 +42,7 @@ mongoose.connect(uri, {
 
 // GET requests
 app.get('/', (req, res) => {
-  res.send('Welcome to myMoviesApp');
+  res.send('Welcome to my MoviesApp');
 });
 //get all movies
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
