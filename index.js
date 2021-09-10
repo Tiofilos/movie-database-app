@@ -1,4 +1,4 @@
-const express = require("express"),
+const express = require("express");
 (morgan = require("morgan")),
   (bodyParser = require("body-parser")),
   (uuid = require("uuid"));
