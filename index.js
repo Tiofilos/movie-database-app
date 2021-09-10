@@ -1,13 +1,16 @@
 const express = require("express"),
-// const cors = require('cors'); //needed for controlling which domain can access my server
-// app.use(cors());
   bodyParser = require("body-parser"),
   morgan = require("morgan"),
   uuid = require("uuid");
   const app = express();
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  
+  const mongoose = require("mongoose"); //needed to access the model connecting to external database
+const Models = require("./models.js");
+const Movies = Models.Movie;
+const Users = Models.User;
+const Genres = Models.Genre
+const Directors = Models.Director
 
 const requestTime = (req, res, next) => {
   req.requestTime = Date.now();
@@ -24,13 +27,9 @@ app.use(requestTime);
 app.use(myLogger);
 app.use(morgan("common"));
 app.use(express.static("public"));
+const cors = require('cors'); //needed for controlling which domain can access my server
+app.use(cors());
 
-const mongoose = require("mongoose"); //needed to access the model connecting to external database
-const Models = require("./models.js");
-const Movies = Models.Movie;
-const Users = Models.User;
-const Genres = Models.Genre
-const Directors = Models.Director
 let auth = require('./auth')(app);     //needed to access auth and passport files...where authentication and authorizations are defined
 const passport = require('passport'); 
 require('./passport');
@@ -285,7 +284,7 @@ app.use((err, req, res, next) => {
 // app.listen(8081, () => {
 //   console.log("Your server is live and listening on port 8081.");
 // });
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8082;
 app.listen(port, '0.0.0.0',() => { 
 	console.log('Listening on Port ' + port);
 });
@@ -339,7 +338,7 @@ app.listen(port, '0.0.0.0',() => {
 // require('./passport');
 
 // //'mongodb+srv://theo1409:tiofami@myclustertheophilus.q40bc.mongodb.net/myMoviesApp?retryWrites=true&w=majority'//This was done to make the URI secure and avoid it being exposed.
-// mongoose.connect(process.env.MYAPI), 
+// mongoose.connect(process.env.MYAPI, 
 //   {useNewUrlParser: true, 
 //     useUnifiedTopology:true
 //   } //this connects mongoose to mongodb to access remote external database
