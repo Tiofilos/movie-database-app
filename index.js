@@ -1,39 +1,93 @@
-const express = require("express"),
-  bodyParser = require("body-parser"),
-  morgan = require("morgan"),
-  uuid = require("uuid");
-const app = express();
+// const express = require("express"),
+//   bodyParser = require("body-parser"),
+//   morgan = require("morgan"),
+//   uuid = require("uuid");
+// const app = express();
   
-const mongoose = require("mongoose"); //needed to access the model connecting to external database
+// const mongoose = require("mongoose"); //needed to access the model connecting to external database
+// const Models = require("./models.js");
+// const Movies = Models.Movie;
+// const Users = Models.User;
+// const Genres = Models.Genre
+// const Directors = Models.Director
+
+// const requestTime = (req, res, next) => {
+//   req.requestTime = Date.now();
+//   next();
+// };
+
+// const myLogger = (req, res, next) => {
+//   console.log("Request URL: " + req.url);
+//   next();
+// };
+
+// const {check, validationResult} = require('express-validator')// this calls the expressValidator 
+// app.use(requestTime);
+// app.use(myLogger);
+// app.use(morgan("common"));
+// app.use(express.static("public"));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+// const cors = require('cors'); //needed for controlling which domain can access my server
+// app.use(cors());
+
+// let auth = require('./auth')(app);     //needed to access auth and passport files...where authentication and authorizations are defined
+// const passport = require('passport'); 
+// require('./passport');
+const express = require("express");
+(morgan = require("morgan")),
+  (bodyParser = require("body-parser")),
+  (uuid = require("uuid"));
+//methodOverride = require('method-override');
+
+const mongoose = require("mongoose");
 const Models = require("./models.js");
+
+const cors = require("cors");
+
+const { check, validationResult } = require("express-validator");
+
+// const Movies = Models.Movie;
 const Movies = Models.Movie;
 const Users = Models.User;
-const Genres = Models.Genre
-const Directors = Models.Director
+const Genres = Models.Genre;
+const Directors = Models.Director;
 
-const requestTime = (req, res, next) => {
-  req.requestTime = Date.now();
-  next();
-};
+// const uri = process.env.CONNECTION_URI || "mongodb://localhost:27017/myFlix_AppDB";
+
+// //This allows Mongoose to connect through process.env
+// mongoose.connect(uri, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+
+//This allows Mongoose to connect locally to the database so it can perform CRUD operations on the documents it contains from within your REST API
+/*mongoose.connect("mongodb://localhost:27017/myFlix_AppDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});*/
+
+const app = express();
+app.use(cors());
 
 const myLogger = (req, res, next) => {
   console.log("Request URL: " + req.url);
   next();
 };
-
-const {check, validationResult} = require('express-validator')// this calls the expressValidator 
-app.use(requestTime);
-app.use(myLogger);
+// Logging middleware
 app.use(morgan("common"));
-app.use(express.static("public"));
+
+// For the sending of static files
+app.use("/documentation", express.static("public"));
+
+// Using body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const cors = require('cors'); //needed for controlling which domain can access my server
-app.use(cors());
 
-let auth = require('./auth')(app);     //needed to access auth and passport files...where authentication and authorizations are defined
-const passport = require('passport'); 
-require('./passport');
+// Importing auth.js and passport
+let auth = require("./auth")(app);
+const passport = require("passport");
+require("./passport");
 const uri = process.env.MYAPI || "mongodb://localhost:27017/myMovieApp";
 mongoose.connect(uri, {
   useNewUrlParser: true,
@@ -179,17 +233,17 @@ Users.findOne({ Username: req.body.Username })  //checks for existing user
 		if (user) {
 			return res.status(400).send(req.body.Username + 'already exists');
 		} else {
-			Users
-				.create({
+			Users.create({
 					Username: req.body.Username,
 					Password: req.body.Password,
 					Email: req.body.Email,
 					Birthday: req.body.Birthday
 				})
-				.then((user) =>{res.status(201).json(user) })
+				.then((user) =>{
+          res.status(201).json(user) })
 			  .catch((error) => {
-				console.error(error);
-				res.status(500).send('Error: ' + error);
+				  console.error(error);
+				  res.status(500).send('Error: ' + error);
 			})
 		}
 	})
